@@ -10,6 +10,7 @@ const geistSans = Geist({
 export default function Home() {
   const [answer, setAnswer] = useState<string | null>(null);
   const [noButtonPosition, setNoButtonPosition] = useState({ x: 0, y: 0 });
+  const [initialNoPosition, setInitialNoPosition] = useState<{ x: number, y: number } | null>(null);
   const noButtonRef = useRef<HTMLButtonElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -38,6 +39,12 @@ export default function Home() {
     setNoButtonPosition({ x: newX, y: newY });
   };
 
+  const handleContainerMouseLeave = () => {
+    if (initialNoPosition) {
+      setNoButtonPosition(initialNoPosition);
+    }
+  };
+
   // Initialize "No" button position on mount
   useEffect(() => {
     if (containerRef.current && noButtonRef.current) {
@@ -52,37 +59,15 @@ export default function Home() {
       const initialX = (containerRect.width / 2) + 12;
       const initialY = 0; // Top aligned with Yes button
 
-      setNoButtonPosition({ x: initialX, y: initialY });
+      const pos = { x: initialX, y: initialY };
+      setNoButtonPosition(pos);
+      setInitialNoPosition(pos);
     }
   }, []);
 
   return (
     <>
-      <style jsx>{`
-        @keyframes heartFloat {
-          0%, 100% {
-            transform: translateY(0) scale(1) rotate(0deg);
-          }
-          25% {
-            transform: translateY(-10px) scale(1.1) rotate(-5deg);
-          }
-          50% {
-            transform: translateY(-15px) scale(1.15) rotate(0deg);
-          }
-          75% {
-            transform: translateY(-10px) scale(1.1) rotate(5deg);
-          }
-        }
 
-        .heart-float {
-          animation: heartFloat 3s ease-in-out infinite;
-          filter: drop-shadow(0 4px 12px rgba(244, 63, 94, 0.3));
-        }
-
-        .heart-float:hover {
-          animation-duration: 1.5s;
-        }
-      `}</style>
 
       <div
         className={`${geistSans.variable} font-sans flex min-h-screen items-center justify-center`}
@@ -112,6 +97,7 @@ export default function Home() {
               <>
                 <div
                   ref={containerRef}
+                  onMouseLeave={handleContainerMouseLeave}
                   className="relative w-full mt-6 max-w-md h-32 flex items-start justify-center"
                 >
                   <div className="absolute left-1/2 -translate-x-1/2 top-0 flex gap-6">
@@ -132,7 +118,7 @@ export default function Home() {
                     onClick={() => setAnswer("no")}
                     className="absolute py-3 px-8 rounded-full border-2 border-gray-300 text-gray-700 text-base font-medium transition-all hover:border-gray-400 hover:bg-gray-50 whitespace-nowrap"
                     style={{
-                      left: `${noButtonPosition.x + 20}px`,
+                      left: `${noButtonPosition.x}px`,
                       top: `${noButtonPosition.y}px`,
                       transition: 'left 0.3s ease-out, top 0.3s ease-out',
                       minWidth: '100px'
@@ -142,7 +128,7 @@ export default function Home() {
                   </button>
                 </div>
                 <p className="text-sm text-gray-800 font-light animate-pulse">
-                  no ko sharm aa rhi hai abhi
+                  no ko sharm aa rhi hai abhi please cooperate
                 </p>
               </>
             ) : (
