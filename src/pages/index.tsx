@@ -41,10 +41,18 @@ export default function Home() {
   // Initialize "No" button position on mount
   useEffect(() => {
     if (containerRef.current && noButtonRef.current) {
-      // Position it to the right of the Yes button with gap
-      const yesButtonWidth = 100; // minWidth of Yes button
-      const gap = 24; // gap-6 = 24px
-      setNoButtonPosition({ x: yesButtonWidth + gap, y: 0 });
+      const containerRect = containerRef.current.getBoundingClientRect();
+      const buttonRect = noButtonRef.current.getBoundingClientRect();
+
+      // Calculate start position: Center of container + half gap
+      // The "Yes" block is centered. Total width of Yes+Gap+No = 100+24+100 = 224.
+      // So center is at 112 from the start of the block.
+      // "No" starts at 12px right of center.
+
+      const initialX = (containerRect.width / 2) + 12;
+      const initialY = 0; // Top aligned with Yes button
+
+      setNoButtonPosition({ x: initialX, y: initialY });
     }
   }, []);
 
@@ -82,59 +90,72 @@ export default function Home() {
       >
         <main className="w-full max-w-4xl mx-4">
           <div
-            className="bg-white rounded-3xl shadow-lg p-16 flex flex-col items-center gap-10"
+            className="bg-white rounded-3xl shadow-lg p-8 md:p-16 flex flex-col items-center gap-10"
             style={{ boxShadow: "0 8px 32px rgba(0, 0, 0, 0.08)" }}
           >
             {/* Heart Animation */}
-            <div className="w-52 h-52">
+            <div className="w-40 h-40 md:w-52 md:h-52">
               <DotLottieReact
-                src="https://lottie.host/3c8682b6-9750-429d-ae2e-c71f9ab49d78/SIxeg3Bxip.lottie"
+                src="/SIxeg3Bxip.lottie"
                 loop
                 autoplay
               />
             </div>
 
             {/* Question */}
-            <h1 className="text-3xl font-light text-center text-gray-800 leading-relaxed max-w-lg">
+            <h1 className="text-2xl md:text-3xl font-light text-center text-gray-800 leading-relaxed max-w-lg">
               Deepanshi, will you be my Valentine?
             </h1>
 
             {/* Buttons */}
             {!answer ? (
-              <div
-                ref={containerRef}
-                className="relative w-full mt-6 max-w-md h-24 flex items-start justify-start gap-6"
-              >
-                <button
-                  onClick={() => setAnswer("yes")}
-                  className="py-3 px-8 rounded-full bg-rose-500 text-white text-base font-medium transition-all hover:bg-rose-600 hover:scale-105 active:scale-95 shadow-md hover:shadow-lg"
-                  style={{ minWidth: '100px' }}
+              <>
+                <div
+                  ref={containerRef}
+                  className="relative w-full mt-6 max-w-md h-32 flex items-start justify-center"
                 >
-                  Yes
-                </button>
-                <button
-                  ref={noButtonRef}
-                  onMouseEnter={handleNoButtonHover}
-                  onClick={() => setAnswer("no")}
-                  className="absolute py-3 px-8 rounded-full border-2 border-gray-300 text-gray-700 text-base font-medium transition-all hover:border-gray-400 hover:bg-gray-50"
-                  style={{
-                    left: `${noButtonPosition.x + 200}px`,
-                    top: `${noButtonPosition.y}px`,
-                    transition: 'left 0.3s ease-out, top 0.3s ease-out',
-                    minWidth: '100px'
-                  }}
-                >
-                  No
-                </button>
-              </div>
+                  <div className="absolute left-1/2 -translate-x-1/2 top-0 flex gap-6">
+                    <button
+                      onClick={() => setAnswer("yes")}
+                      className="py-3 px-8 rounded-full bg-rose-500 text-white text-base font-medium transition-all hover:bg-rose-600 hover:scale-105 active:scale-95 shadow-md hover:shadow-lg whitespace-nowrap"
+                      style={{ minWidth: '100px', zIndex: 10 }}
+                    >
+                      Yes
+                    </button>
+                    {/* Placeholder for No button initial position to keep layout stable */}
+                    <div style={{ width: '100px' }}></div>
+                  </div>
+
+                  <button
+                    ref={noButtonRef}
+                    onMouseEnter={handleNoButtonHover}
+                    onClick={() => setAnswer("no")}
+                    className="absolute py-3 px-8 rounded-full border-2 border-gray-300 text-gray-700 text-base font-medium transition-all hover:border-gray-400 hover:bg-gray-50 whitespace-nowrap"
+                    style={{
+                      left: `${noButtonPosition.x + 20}px`,
+                      top: `${noButtonPosition.y}px`,
+                      transition: 'left 0.3s ease-out, top 0.3s ease-out',
+                      minWidth: '100px'
+                    }}
+                  >
+                    No
+                  </button>
+                </div>
+                <p className="text-sm text-gray-800 font-light animate-pulse">
+                  no ko sharm aa rhi hai abhi
+                </p>
+              </>
             ) : (
               <div className="text-center mt-6 w-full flex flex-col items-center gap-4">
                 {answer === "yes" && (
-                  <img
-                    src="/yay.jpg"
-                    alt="Celebration"
-                    className="h-40 w-auto object-contain"
-                  />
+                  <>
+                    <h2 className="text-4xl font-bold text-rose-500 mb-2">Yay!</h2>
+                    <img
+                      src="/yay.jpg"
+                      alt="Celebration"
+                      className="h-40 w-auto object-contain"
+                    />
+                  </>
                 )}
 
               </div>
